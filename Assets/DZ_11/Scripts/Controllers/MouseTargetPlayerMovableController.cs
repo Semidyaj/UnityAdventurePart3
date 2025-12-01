@@ -1,49 +1,62 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace DZ_11
 {
     public class MouseTargetPlayerMovableController : Controller
     {
+        private const int MinCornersCountInPathToMove = 2;
+        private const int StartCornerIndex = 0;
+        private const int TargetCornerIndex = 1;
+
         private IDirectionalMovable _player;
 
         private LayerMask _groundMask;
         private Ray _ray;
 
-        private Vector3 _currentDirection;
         private Vector3 _currentTarget;
 
-        public MouseTargetPlayerMovableController(IDirectionalMovable player, LayerMask groundMask)
+        private NavMeshQueryFilter _queryFilter;
+        private NavMeshPath _path = new NavMeshPath();
+
+        public MouseTargetPlayerMovableController(IDirectionalMovable player, LayerMask groundMask, NavMeshQueryFilter queryFilter)
         {
             _player = player;
             _groundMask = groundMask;
+            _queryFilter = queryFilter;
+            _currentTarget = _player.CurrentPosition;
         }
 
         protected override void UpdateLogic(float deltaTime)
         {
             if (Input.GetMouseButtonDown(0))
+                SetTargetPosition();
+
+            if (_currentTarget != _player.CurrentPosition)
             {
-                _currentDirection = SetTargetPosition().normalized;
+                if (NavMeshUtils.TryGetPath(_player.CurrentPosition, _currentTarget, _queryFilter, _path))
+                {
+                    float distanceToTarget = NavMeshUtils.GetPathLength(_path);
 
-                _player.SetMoveDirection(_currentDirection);
+                    if (EnoughCornersInPath(_path))
+                    {
+                        _player.SetMoveDirection((_path.corners[TargetCornerIndex] - _path.corners[StartCornerIndex]).normalized);
+
+                        if (NavMeshUtils.GetPathLength(_path) < 0.1f)
+                            _player.StopMove();
+                    }
+                }
             }
-
-            float distanceToTarget = (_currentTarget - _player.CurrentPosition).magnitude;
-
-            if (distanceToTarget < 0.1f)
-                _player.StopMove();
         }
 
-        private Vector3 SetTargetPosition()
+        private bool EnoughCornersInPath(NavMeshPath pathToTarget) => pathToTarget.corners.Length >= MinCornersCountInPathToMove;
+
+        private void SetTargetPosition()
         {
             _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(_ray, out RaycastHit groundHit, 100f, _groundMask))
-            {
                 _currentTarget = groundHit.point;
-                return groundHit.point - _player.CurrentPosition;
-            }
-
-            return _player.CurrentPosition;
         }
     }
 }

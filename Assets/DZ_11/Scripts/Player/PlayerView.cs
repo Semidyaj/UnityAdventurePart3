@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace DZ_11
@@ -13,7 +12,7 @@ namespace DZ_11
 
         private void Update()
         {
-            if (_player.CurrentVelocity.magnitude > 0.05f)
+            if (_player.CurrentVelocity.magnitude > 0.1f)
                 StartRunning();
             else
                 StopRunning();

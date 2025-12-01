@@ -2,9 +2,8 @@ using UnityEngine;
 
 namespace DZ_11
 {
-    public interface IDirectionalMovable
+    public interface IDirectionalMovable : ITransformPosition
     {
-        Vector3 CurrentPosition { get; }
         Vector3 CurrentVelocity { get; }
 
         void SetMoveDirection(Vector3 inputDirection);
