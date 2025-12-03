@@ -8,6 +8,8 @@ namespace DZ_11
 
         public virtual void Disable() => _isEnable = false;
 
+        public virtual bool IsEnabled => _isEnable;
+
         public void Update(float deltaTime)
         {
             if (_isEnable == false)

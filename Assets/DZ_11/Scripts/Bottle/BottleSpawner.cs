@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DZ_11
@@ -5,41 +6,52 @@ namespace DZ_11
     public class BottleSpawner : MonoBehaviour
     {
         [SerializeField] private Bottle _bottlePrefab;
-        [SerializeField] private LayerMask _groundMask;
 
-        private Vector3 _spawnPosition;
+        [SerializeField] private float _cooldown;
+        [SerializeField] private List<BottleSpawnPoint> _spawnPoints;
 
-        private Ray _ray;
-
-        private bool _isGround;
+        private float _time;
 
         private void Update()
         {
-            SetSpawnPosition();
-            Spawn();
-        }
+            _time += Time.deltaTime;
 
-        private void Spawn()
-        {
-            if (_isGround)
+            if (_time >= _cooldown)
             {
-                Instantiate(_bottlePrefab, _spawnPosition, Quaternion.identity);
-                _isGround = false;
-            }
-        }
+                List<BottleSpawnPoint> emptyPoints = GetEmptyPoints();
 
-        private void SetSpawnPosition()
-        {
-            if(Input.GetMouseButtonDown(0))
-            {
-                _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(_ray, out RaycastHit groundHit, 100f, _groundMask))
+                if (emptyPoints.Count == 0)
                 {
-                    _spawnPosition = groundHit.point;
-                    _isGround = true;
+                    _time = 0;
+                    return;
                 }
+
+                BottleSpawnPoint point = GenerateEmptyPoint(emptyPoints);
+
+                Spawn(point);
             }
+
+        }
+
+        private BottleSpawnPoint GenerateEmptyPoint(List<BottleSpawnPoint> emptyPoints) => emptyPoints[Random.Range(0, emptyPoints.Count)];
+
+        private List<BottleSpawnPoint> GetEmptyPoints()
+        {
+            List<BottleSpawnPoint> emptyPoints = new List<BottleSpawnPoint>();
+
+            foreach (BottleSpawnPoint point in _spawnPoints)
+                if (point.IsEmpty == true)
+                    emptyPoints.Add(point);
+
+            return emptyPoints;
+        }
+
+        private void Spawn(BottleSpawnPoint point)
+        {
+            Bottle bottle = Instantiate(_bottlePrefab, point.transform.position, Quaternion.identity);
+            point.Occupy(bottle);
+
+            _time = 0;
         }
     }
 }

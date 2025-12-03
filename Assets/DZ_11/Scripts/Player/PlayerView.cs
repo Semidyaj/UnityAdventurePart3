@@ -6,6 +6,9 @@ namespace DZ_11
     {
         private readonly int IsRunningKey = Animator.StringToHash("IsRunning");
         private readonly int IsDieKey = Animator.StringToHash("IsDie");
+        private readonly int IsHittingKey = Animator.StringToHash("IsHitting");
+
+        private const float MinVelocityToStartRunningAnimation = 0.05f;
 
         [SerializeField] private Animator _animator;
         [SerializeField] private Player _player;
@@ -13,6 +16,13 @@ namespace DZ_11
         [SerializeField] private float _injuredHealthPercent;
 
         private int _injuredLayerIndex = 1;
+
+        private float _previousFrameHealth;
+
+        private void Start()
+        {
+            _previousFrameHealth = _player.MaxHealth;
+        }
 
         private void Update()
         {
@@ -24,13 +34,22 @@ namespace DZ_11
             if (_player.CurrentHealth <= 0)
                 Die();
 
-            if (_player.CurrentVelocity.magnitude > 0.1f)
+            if (_player.CurrentHealth < _previousFrameHealth)
+            {
+                TakeHit();
+            }
+
+            _previousFrameHealth = _player.CurrentHealth;
+
+            if (_player.CurrentVelocity.magnitude > MinVelocityToStartRunningAnimation)
                 StartRunning();
             else
                 StopRunning();
         }
 
         private void Die() => _animator.SetBool(IsDieKey, true);
+
+        private void TakeHit() => _animator.SetTrigger(IsHittingKey);
 
         private void StartRunning() => _animator.SetBool(IsRunningKey, true);
 

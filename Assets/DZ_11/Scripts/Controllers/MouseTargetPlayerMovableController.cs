@@ -8,6 +8,7 @@ namespace DZ_11
         private const int MinCornersCountInPathToMove = 2;
         private const int StartCornerIndex = 0;
         private const int TargetCornerIndex = 1;
+        private const int LeftMouseButtonKey = 0;
 
         private IDirectionalMovable _player;
 
@@ -15,6 +16,7 @@ namespace DZ_11
         private Ray _ray;
 
         private Vector3 _currentTarget;
+        private float _distanceToStop = 0.05f;
 
         private NavMeshQueryFilter _queryFilter;
         private NavMeshPath _path = new NavMeshPath();
@@ -29,7 +31,7 @@ namespace DZ_11
 
         protected override void UpdateLogic(float deltaTime)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(LeftMouseButtonKey))
                 SetTargetPosition();
 
             if (_currentTarget != _player.CurrentPosition)
@@ -42,7 +44,7 @@ namespace DZ_11
                     {
                         _player.SetMoveDirection((_path.corners[TargetCornerIndex] - _path.corners[StartCornerIndex]).normalized);
 
-                        if (NavMeshUtils.GetPathLength(_path) < 0.1f)
+                        if (NavMeshUtils.GetPathLength(_path) < _distanceToStop)
                             _player.StopMove();
                     }
                 }

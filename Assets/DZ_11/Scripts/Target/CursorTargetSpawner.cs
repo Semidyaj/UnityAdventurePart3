@@ -4,6 +4,8 @@ namespace DZ_11
 {
     public class CursorTargetSpawner : MonoBehaviour
     {
+        private const int LeftMouseButtonKey = 0;
+
         [SerializeField] private Cursor _cursorPrefab;
         [SerializeField] private LayerMask _groundMask;
 
@@ -36,7 +38,7 @@ namespace DZ_11
 
         private void SetSpawnPosition()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(LeftMouseButtonKey))
             {
                 _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 

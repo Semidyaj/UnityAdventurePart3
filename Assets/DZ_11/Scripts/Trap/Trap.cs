@@ -1,5 +1,3 @@
-using System;
-using System.Data;
 using UnityEngine;
 
 namespace DZ_11
@@ -16,14 +14,20 @@ namespace DZ_11
 
         private bool _isTriggered;
 
+        public bool CanPlayHitAnimation { get; private set; }
+
         private void Update()
         {
+            CanPlayHitAnimation = false;
+
             if (_isTriggered)
             {
                 _timer += Time.deltaTime;
 
                 if (_timer >= _timeToHit)
                 {
+                    CanPlayHitAnimation = true;
+
                     ApplyDamage();
                     _timer = 0;
                     _isTriggered = false;

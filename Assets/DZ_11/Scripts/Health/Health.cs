@@ -23,7 +23,7 @@ namespace DZ_11
 
         public void TakeDamage(float damage)
         {
-            if (damage < 0)
+            if (damage <= 0)
                 return;
 
             CurrentHealth = Mathf.Max(CurrentHealth - damage, 0);
