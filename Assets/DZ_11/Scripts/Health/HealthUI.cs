@@ -9,23 +9,24 @@ namespace DZ_11
         [SerializeField] private Image _filledImage;
         [SerializeField] private TextMeshProUGUI _healthCounterText;
 
-        [SerializeField] private Player _player;
+        private IHealable _healable;
 
         private float _maxHealth;
         private float _currentHealth;
 
-        private void Start()
-        {
-            _maxHealth = _player.MaxHealth;
-        }
-
         private void Update()
         {
-            _currentHealth = _player.CurrentHealth;
+            _currentHealth = _healable.CurrentHealth;
 
             _filledImage.fillAmount = _currentHealth / _maxHealth;
 
             _healthCounterText.text = _currentHealth.ToString();
+        }
+
+        public void Initialize(IHealable healable, float maxHealth)
+        {
+            _healable = healable;
+            _maxHealth = maxHealth;
         }
     }
 }

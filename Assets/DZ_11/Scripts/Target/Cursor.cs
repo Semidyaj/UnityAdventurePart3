@@ -6,7 +6,7 @@ namespace DZ_11
     {
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponent<Player>() != null)
+            if (other.GetComponent<AgentPlayer>() != null)
                 Destroy(gameObject);
         }
     }
